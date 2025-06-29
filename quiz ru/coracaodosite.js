@@ -1,5 +1,5 @@
 // ======================================================= //
-//           Coração do Site v2.0 - Agora com mais IA?     //
+//           Coração do Site v2.0     //
 // ======================================================= //
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -114,17 +114,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         pergunta.opcoes.forEach(opcao => {
             const radioId = `opcao-${opcao.replace(/\s+/g, '-')}`;
+            // Alteração: Input radio com type="radio" e name="resposta", sem o div wrapper direto para o label
             const elementoOpcao = `
-                <div>
-                    <input type="radio" id="${radioId}" name="resposta" value="${opcao}" class="opcao-radio">
-                    <label for="${radioId}" class="opcao-label">${opcao}</label>
-                </div>
+                <input type="radio" id="${radioId}" name="resposta" value="${opcao}" class="opcao-radio">
+                <label for="${radioId}" class="opcao-label">${opcao}</label>
             `;
             opcoesContainer.innerHTML += elementoOpcao;
         });
         
-        document.querySelectorAll('.opcao-label').forEach(label => {
-            label.addEventListener('click', () => {
+        // Alteração: Listener para habilitar o botão de responder ao selecionar uma opção
+        document.querySelectorAll('input[name="resposta"]').forEach(radio => {
+            radio.addEventListener('change', () => {
                 document.getElementById('btn-responder').disabled = false;
             });
         });
@@ -132,25 +132,31 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-responder').disabled = true;
     };
 
-    const verificarResposta = () => {
+    const verificarResposta = (event) => {
+        event.preventDefault(); // Previne o envio padrão do formulário
+
         const respostaSelecionada = document.querySelector('input[name="resposta"]:checked');
         if (!respostaSelecionada) return;
 
         const respostaCorreta = perguntasAtuais[indicePerguntaAtual].resposta;
         const labels = document.querySelectorAll('.opcao-label');
-        document.querySelectorAll('.opcao-radio').forEach(radio => radio.disabled = true); // Bloqueia outras respostas
+        // Desabilita todos os rádios para que o usuário não possa mudar a resposta após clicar em "Responder"
+        document.querySelectorAll('.opcao-radio').forEach(radio => radio.disabled = true); 
         
         document.getElementById('btn-responder').disabled = true;
 
         if(respostaSelecionada.value === respostaCorreta) {
             pontuacao++;
             mostrarToast(gerarMensagemDinamica('acerto'));
+            // Adiciona a classe 'correta' ao label associado
             respostaSelecionada.nextElementSibling.classList.add('correta');
-            atualizarPlacar(); // Atualiza o placar imediatamente após o acerto
+            atualizarPlacar(); 
         } else {
             mostrarToast(gerarMensagemDinamica('erro'));
+            // Adiciona a classe 'errada' ao label selecionado pelo usuário
             respostaSelecionada.nextElementSibling.classList.add('errada');
             labels.forEach(label => {
+                // Adiciona a classe 'correta' ao label da resposta correta
                 if (label.textContent === respostaCorreta) {
                     label.classList.add('correta');
                 }
@@ -190,9 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
         perguntasAtuais.sort(() => Math.random() - 0.5); 
         carregarPergunta();
         
-        const btnResponder = document.getElementById('btn-responder');
-        if(btnResponder) {
-            btnResponder.addEventListener('click', verificarResposta);
+        // Alteração: Adiciona o listener ao formulário para o evento 'submit'
+        const quizForm = document.getElementById('quiz-form');
+        if(quizForm) {
+            quizForm.addEventListener('submit', verificarResposta);
         }
     }
 
@@ -213,11 +220,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (temaAtual === 'dark') {
             document.documentElement.removeAttribute('data-theme');
             localStorage.removeItem('theme');
+            document.body.classList.remove('dark-mode'); // Remove a classe do body também
         } else {
             document.documentElement.setAttribute('data-theme', 'dark');
             localStorage.setItem('theme', 'dark');
+            document.body.classList.add('dark-mode'); // Adiciona a classe ao body
         }
     });
+
+    // Garante que a classe dark-mode seja aplicada ao carregar a página se o tema for dark
+    if (document.documentElement.getAttribute('data-theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
     
     document.addEventListener('mousemove', (e) => {
         if (!parallaxBg) return;

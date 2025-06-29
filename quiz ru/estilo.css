@@ -190,6 +190,20 @@ p {
     gap: 15px;
     margin-bottom: 30px;
     text-align: left;
+    /* Adiciona flexbox para alinhar input e label */
+    display: flex; 
+    flex-direction: column;
+}
+
+/* MODIFICAÇÃO PRINCIPAL: Oculta o radio button e estiliza o label */
+.opcao-radio {
+    /* Esconde completamente o input radio original */
+    -webkit-appearance: none; /* Para navegadores WebKit (Chrome, Safari) */
+    -moz-appearance: none;    /* Para navegadores Mozilla (Firefox) */
+    appearance: none;         /* Padrão */
+    position: absolute;       /* Remove do fluxo normal do documento */
+    top: -9999px;             /* Move para fora da tela */
+    left: -9999px;
 }
 
 .opcao-label {
@@ -200,6 +214,9 @@ p {
     border: 1px solid var(--cor-borda-sutil);
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    /* Garante que o label ocupe o espaço */
+    width: 100%; 
+    box-sizing: border-box; /* Inclui padding e border no width */
 }
 
 .opcao-label:hover {
@@ -207,10 +224,7 @@ p {
     transform: translateX(5px);
 }
 
-.opcao-radio {
-    display: none;
-}
-
+/* Quando o radio button está checado, aplica o estilo ao label adjacente */
 .opcao-radio:checked + .opcao-label {
     background-color: var(--cor-terciaria);
     color: white;
